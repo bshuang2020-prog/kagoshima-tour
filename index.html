@@ -38,6 +38,9 @@
     background:#eef6ee; color:#2c4d2e; line-height:1.45;}
   .weather .tip.rain{background:#e7f0fb; color:#274b7a;}
   .weather .tip b{font-weight:900;}
+  .weather .tip .wxalts{display:flex; gap:6px; flex-wrap:wrap; margin-top:7px;}
+  .weather .tip .wxbtn{font-size:12px; font-weight:800; border:0; border-radius:999px; padding:5px 11px; cursor:pointer; color:#fff;}
+  .weather .tip .wxbtn.aq{background:#1c84a8;} .weather .tip .wxbtn.isf{background:#8a6d2f;} .weather .tip .wxbtn.aeon{background:#b3406b;}
   /* Stage */
   .stage{display:grid; gap:14px; grid-template-columns:1fr 388px 1fr;
     grid-template-areas:"c1 map c3" "c2 map c4";}
@@ -72,6 +75,7 @@
   .chip[data-place="p3"].active{background:var(--coral); border-color:var(--coral); color:#fff;}
   .chip[data-place="p4"].active{background:var(--indigo); border-color:var(--indigo); color:#fff;}
   .chip.route{background:#eaf6f7; border-color:#7fc3cc; color:#236068;}
+  .chip[data-place="ov"].active{background:#2b545b; border-color:#2b545b; color:#fff;}
   .gmap{flex:1; width:100%; border:0; display:block; min-height:300px;}
   .maphint{font-size:11.5px; color:#6b6f72; text-align:center; padding:7px 8px; background:#fbf7ec; border-top:1px solid var(--line);}
   /* Timeline */
@@ -151,6 +155,7 @@
   <div class="stage">
     <div class="mapwrap">
       <div class="chips" id="chips">
+        <button class="chip" data-place="ov" onclick="showOverview()">🔭 全程總覽</button>
         <button class="chip" data-place="port" onclick="showMap('port')">🚢 下船碼頭</button>
         <button class="chip" data-place="p1" onclick="showMap('p1')">① 仙巌園</button>
         <button class="chip" data-place="p2" onclick="showMap('p2')">② 城山展望台</button>
@@ -159,9 +164,9 @@
         <a class="chip route" id="routechip" href="#" target="_blank" rel="noopener">🗺 全程導航</a>
       </div>
       <iframe class="gmap" id="gmap" title="鹿兒島 Google 地圖"
-        src="https://maps.google.com/maps?q=%E3%83%9E%E3%83%AA%E3%83%B3%E3%83%9D%E3%83%BC%E3%83%88%E3%81%8B%E3%81%94%E3%81%97%E3%81%BE&z=13&hl=ja&output=embed"
+        src="https://maps.google.com/maps?saddr=31.5356,130.5538&daddr=31.6174,130.5772%20to:31.5962,130.5500%20to:31.5892,130.5560%20to:31.5843,130.5428&hl=ja&output=embed"
         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <div class="maphint" id="maphint">目前顯示：🚢 下船碼頭（馬林港）— 點按鈕切換，或點卡片看詳細資訊</div>
+      <div class="maphint" id="maphint">碼頭＋四景點相對位置總覽 — 點按鈕看單點，或點卡片看詳細資訊</div>
     </div>
 
     <div class="card c1 card1" tabindex="0" onclick="openDetail('p1')" onkeydown="cardKey(event,'p1')">
@@ -255,13 +260,23 @@
     +'&destination='+encodeURIComponent('マリンポートかごしま')
     +'&waypoints='+encodeURIComponent('仙巌園|城山展望台|天文館 むじゃき|アミュプラザ鹿児島')+'&travelmode=driving';
 
+  var OVERVIEW='https://maps.google.com/maps?saddr=31.5356,130.5538&daddr=31.6174,130.5772%20to:31.5962,130.5500%20to:31.5892,130.5560%20to:31.5843,130.5428&hl=ja&output=embed';
   var PLACES={
     port:{q:'マリンポートかごしま', z:13, name:'🚢 下船碼頭（馬林港）'},
     p1:{q:'仙巌園 鹿児島', z:16, name:'① 仙巌園'},
     p2:{q:'城山展望台 鹿児島', z:16, name:'② 城山展望台'},
     p3:{q:'天文館 むじゃき 鹿児島', z:16, name:'③ 天文館商圈'},
-    p4:{q:'アミュプラザ鹿児島', z:16, name:'④ AMU PLAZA 中央站'}
+    p4:{q:'アミュプラザ鹿児島', z:16, name:'④ AMU PLAZA 中央站'},
+    aq:{q:'いおワールド かごしま水族館', z:16, name:'🐬 いおワールド水族館（雨備）'},
+    isf:{q:'維新ふるさと館 鹿児島', z:16, name:'🏯 維新故鄉館（雨備）'},
+    aeon:{q:'イオンモール鹿児島', z:15, name:'🛍 永旺夢樂城鹿兒島（雨備）'}
   };
+  function showOverview(){
+    document.getElementById('gmap').src=OVERVIEW;
+    document.getElementById('maphint').textContent='碼頭＋四景點相對位置總覽（碼頭→仙巌園→城山→天文館→中央站）— 點按鈕看單點，或點卡片看詳情';
+    var els=document.querySelectorAll('.chip[data-place]');
+    for(var i=0;i<els.length;i++){ els[i].classList.toggle('active', els[i].getAttribute('data-place')==='ov'); }
+  }
   function showMap(id){
     var p=PLACES[id]; if(!p) return;
     document.getElementById('gmap').src='https://maps.google.com/maps?q='+encodeURIComponent(p.q)+'&z='+p.z+'&hl=ja&output=embed';
@@ -321,10 +336,17 @@
     51:['🌦️','毛毛雨'],53:['🌦️','毛毛雨'],55:['🌦️','毛毛雨'],61:['🌧️','小雨'],63:['🌧️','中雨'],65:['🌧️','大雨'],
     71:['🌨️','小雪'],80:['🌦️','陣雨'],81:['🌧️','陣雨'],82:['⛈️','強陣雨'],95:['⛈️','雷雨'],96:['⛈️','雷雨冰雹'],99:['⛈️','強雷雨']};
   function weekday(s){ var w=['日','一','二','三','四','五','六']; return '週'+w[new Date(s+'T00:00:00+09:00').getDay()]; }
+  function altBtns(){
+    return '<div class="wxalts">'
+      +'<button class="wxbtn aq" onclick="showMap(\'aq\')">🐬 水族館</button>'
+      +'<button class="wxbtn isf" onclick="showMap(\'isf\')">🏯 維新故鄉館</button>'
+      +'<button class="wxbtn aeon" onclick="showMap(\'aeon\')">🛍 永旺夢樂城</button>'
+      +'</div>';
+  }
   function setWeatherFallback(){
     document.getElementById('wtemp').textContent='典型約 26–33°C・悶熱潮濕';
-    var tip=document.getElementById('wtip');
-    tip.innerHTML='<b>7月鹿兒島典型天氣</b>：悶熱潮濕、午後易有雷陣雨、紫外線強。備援顯示（無法連網取得即時預報時）。';
+    var tip=document.getElementById('wtip'); tip.className='tip rain';
+    tip.innerHTML='<b>7月鹿兒島典型天氣</b>：悶熱潮濕、午後易雷陣雨（無法連網取得即時預報）。雨備三選，點按鈕在地圖顯示：'+altBtns();
   }
   function loadWeather(){
     var url='https://api.open-meteo.com/v1/forecast?latitude=31.5966&longitude=130.5571&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&start_date=2026-07-06&end_date=2026-07-06';
@@ -339,7 +361,7 @@
       document.getElementById('wtemp').innerHTML=temp;
       var rainy=(pop!=null&&pop>=50)||[51,53,55,61,63,65,80,81,82,95,96,99].indexOf(code)>=0;
       var tip=document.getElementById('wtip');
-      if(rainy){ tip.className='tip rain'; tip.innerHTML='☔ <b>預報有雨：建議啟動雨備</b> — 戶外的<b>城山展望台</b>改室內<b>いおワールド水族館</b>，其餘照走，時間幾乎不變。'; }
+      if(rainy){ tip.className='tip rain'; tip.innerHTML='☔ <b>預報有雨：建議啟動雨備</b> — 戶外的<b>城山展望台</b>改室內，三選一（點按鈕在地圖顯示）：'+altBtns(); }
       else{ tip.className='tip'; tip.innerHTML='☀️ <b>預報晴熱：注意防曬補水</b> — 城山停留勿過久；仙巌園御殿、天文館、AMU 皆可避暑。'; }
     }).catch(function(){ setWeatherFallback(); });
   }
@@ -353,7 +375,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    showMap('port'); loadWeather(); makeQR();
+    showOverview(); loadWeather(); makeQR();
   });
 </script>
 </body>
