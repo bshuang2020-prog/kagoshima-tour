@@ -147,7 +147,7 @@
   <!-- WEATHER -->
   <div class="weather" id="weather">
     <div class="wx"><div class="wico" id="wico">⛅</div>
-      <div class="wmain"><div class="d" id="wdate">7/6 鹿兒島天氣</div><div class="t" id="wtemp">載入中…</div></div></div>
+      <div class="wmain"><div class="d" id="wdate">7/6（週一）鹿兒島天氣</div><div class="t" id="wtemp">載入中…</div></div></div>
     <div class="tip" id="wtip">查詢當天預報中…（需連網）</div>
   </div>
 
@@ -335,7 +335,7 @@
   var WMO={0:['☀️','晴'],1:['🌤️','大致晴'],2:['⛅','多雲'],3:['☁️','陰'],45:['🌫️','霧'],48:['🌫️','霧凇'],
     51:['🌦️','毛毛雨'],53:['🌦️','毛毛雨'],55:['🌦️','毛毛雨'],61:['🌧️','小雨'],63:['🌧️','中雨'],65:['🌧️','大雨'],
     71:['🌨️','小雪'],80:['🌦️','陣雨'],81:['🌧️','陣雨'],82:['⛈️','強陣雨'],95:['⛈️','雷雨'],96:['⛈️','雷雨冰雹'],99:['⛈️','強雷雨']};
-  function weekday(s){ var w=['日','一','二','三','四','五','六']; return '週'+w[new Date(s+'T00:00:00+09:00').getDay()]; }
+  function weekday(s){ var p=s.split('-'); var w=['日','一','二','三','四','五','六']; return '週'+w[new Date(+p[0], +p[1]-1, +p[2]).getDay()]; }
   function altBtns(){
     return '<div class="wxalts">'
       +'<button class="wxbtn aq" onclick="showMap(\'aq\')">🐬 水族館</button>'
@@ -355,7 +355,7 @@
       var code=dy.weather_code[0], tmax=dy.temperature_2m_max[0], tmin=dy.temperature_2m_min[0], pop=dy.precipitation_probability_max[0];
       var w=WMO[code]||['🌡️','—'];
       document.getElementById('wico').textContent=w[0];
-      document.getElementById('wdate').textContent='7/6（'+weekday('2026-07-06')+'）鹿兒島・'+w[1];
+      document.getElementById('wdate').textContent='7/6（週一）鹿兒島・'+w[1];
       var temp=(tmax!=null?Math.round(tmax):'—')+'° / '+(tmin!=null?Math.round(tmin):'—')+'°';
       if(pop!=null) temp+='　降雨機率 '+pop+'%';
       document.getElementById('wtemp').innerHTML=temp;
